@@ -1,0 +1,46 @@
+const xml = `
+<list>
+  <student>
+    <name lang="en">
+      <first>Ivan</first>
+      <second>Ivanov</second>
+    </name>
+    <age>35</age>
+    <prof>teacher</prof>
+  </student>
+  <student>
+    <name lang="ru">
+      <first>Петр</first>
+      <second>Петров</second>
+    </name>
+    <age>58</age>
+    <prof>driver</prof>
+  </student>
+</list>
+`;
+
+function xmlToJsObject(xml) {
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(xml, 'text/xml');
+
+  const students = Array.from(xmlDoc.querySelectorAll('student')).map((studentNode) => {
+    const nameNode = studentNode.querySelector('name');
+    const firstName = nameNode.querySelector('first').textContent;
+    const lastName = nameNode.querySelector('second').textContent;
+    const lang = nameNode.getAttribute('lang');
+
+    return {
+      name: `${firstName} ${lastName}`,
+      age: parseInt(studentNode.querySelector('age').textContent, 10),
+      prof: studentNode.querySelector('prof').textContent,
+      lang: lang,
+    };
+  });
+
+  return {
+    list: students,
+  };
+}
+
+const jsObject = xmlToJsObject(xml);
+console.log(jsObject);
