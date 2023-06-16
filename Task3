@@ -1,0 +1,40 @@
+
+const input = document.querySelector('input');
+const button = document.querySelector('button');
+const output = document.querySelector('.output');
+
+function handleClick() {
+const value = parseInt(input.value);
+
+if (value >= 1 && value <= 10) {
+    
+const xhr = new XMLHttpRequest();
+
+xhr.onload = function () {
+        if (xhr.status === 200) {
+        const response = JSON.parse(xhr.responseText);
+        displayImages(response);
+      } else {
+        output.textContent = 'Ошибка загрузки изображений';
+      }
+    };
+
+    const url = `https://picsum.photos/v2/list?limit=${value}`;
+
+    xhr.open('GET', url);
+    xhr.send();
+  } else {
+    output.textContent = 'Число вне диапазона от 1 до 10';
+  }
+}
+
+function displayImages(images) {
+  output.innerHTML = '';
+
+images.forEach(function (image) {
+    const img = document.createElement('img');
+    img.src = image.download_url;
+    output.appendChild(img);
+  });
+}
+button.addEventListener('click', handleClick);
