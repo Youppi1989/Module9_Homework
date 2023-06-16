@@ -1,0 +1,83 @@
+const pageInput = document.querySelector('#page-input');
+const limitInput = document.querySelector('#limit-input');
+const button = document.querySelector('#request-button');
+const output = document.querySelector('.output');
+
+function handleClick() {
+
+  const page = parseInt(pageInput.value);
+  const limit = parseInt(limitInput.value);
+  const isPageInRange = isInRange(page);
+  const isLimitInRange = isInRange(limit);
+
+  if (!isPageInRange && !isLimitInRange) {
+    output.textContent = 'Номер страницы и лимит вне диапазона от 1 до 10 или не являются числами';
+  } else if (!isPageInRange) {
+    output.textContent = 'Номер страницы вне диапазона от 1 до 10';
+  } else if (!isLimitInRange) {
+    output.textContent = 'Лимит вне диапазона от 1 до 10';
+  } else {
+ 
+    const url = `https://picsum.photos/v2/list?page=${page}&limit=${limit}`;
+    
+    fetch(url)
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Ошибка загрузки изображений');
+        }
+      })
+      .then(data => {
+        displayImages(data);
+        saveToLocalStorage(url);
+      })
+      .catch(error => {
+        output.textContent = error.message;
+      });
+  }
+}
+
+
+function isInRange(value) {
+  return !isNaN(value) && value >= 1 && value <= 10;
+}
+
+function displayImages(images) {
+
+  output.innerHTML = '';
+  
+  images.forEach(function (image) {
+    const img = document.createElement('img');
+    img.src = image.download_url;
+    output.appendChild(img);
+  });
+}
+
+
+function saveToLocalStorage(url) {
+  localStorage.setItem('lastRequestURL', url);
+}
+
+function loadLastRequest() {
+  const lastRequestURL = localStorage.getItem('lastRequestURL');
+  if (lastRequestURL) {
+    fetch(lastRequestURL)
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Ошибка загрузки изображений');
+        }
+      })
+      .then(data => {
+        displayImages(data);
+      })
+      .catch(error => {
+        output.textContent = error.message;
+      });
+  }
+}
+
+button.addEventListener('click', handleClick);
+loadLastRequest();
