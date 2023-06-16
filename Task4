@@ -1,0 +1,43 @@
+const input1 = document.querySelector('#input1');
+const input2 = document.querySelector('#input2');
+const button = document.querySelector('#submit');
+const output = document.querySelector('.output');
+
+function handleClick() {
+
+  const value1 = parseInt(input1.value);
+  const value2 = parseInt(input2.value);
+
+  if (isInRange(value1) && isInRange(value2)) {
+  const url = `https://picsum.photos/${value1}/${value2}`;
+
+    fetch(url)
+      .then(response => {
+        if (response.ok) {
+          displayImage(response.url);
+        } else {
+          throw new Error('Ошибка загрузки изображения');
+        }
+      })
+      .catch(error => {
+        output.textContent = error.message;
+      });
+  } else {
+    output.textContent = 'Одно из чисел вне диапазона от 100 до 300 или не является числом';
+  }
+}
+
+
+function isInRange(value) {
+  return !isNaN(value) && value >= 100 && value <= 300;
+}
+function displayImage(url) {
+  output.innerHTML = '';
+
+
+  const img = document.createElement('img');
+  img.src = url;
+  output.appendChild(img);
+}
+
+button.addEventListener('click', handleClick);
